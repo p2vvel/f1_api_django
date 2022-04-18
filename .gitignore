@@ -6,3 +6,4 @@ venv/
 *.zip
 *.sqlite3
 resources/
+**/migrations/
