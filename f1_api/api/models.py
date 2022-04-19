@@ -9,7 +9,7 @@ from django.db import models
 
 
 class Circuits(models.Model):
-    circuitid = models.AutoField(db_column='circuitId', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='circuitId', primary_key=True)  # Field name made lowercase.
     circuitref = models.CharField(db_column='circuitRef', max_length=255)  # Field name made lowercase.
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255, blank=True, null=True)
@@ -24,8 +24,8 @@ class Circuits(models.Model):
         db_table = 'circuits'
 
 
-class Constructorresults(models.Model):
-    constructorresultsid = models.AutoField(db_column='constructorResultsId', primary_key=True)  # Field name made lowercase.
+class ConstructorResults(models.Model):
+    id = models.AutoField(db_column='constructorResultsId', primary_key=True)  # Field name made lowercase.
     raceid = models.ForeignKey('Races', models.DO_NOTHING, db_column='raceId')  # Field name made lowercase.
     constructorid = models.ForeignKey('Constructors', models.DO_NOTHING, db_column='constructorId')  # Field name made lowercase.
     points = models.FloatField(blank=True, null=True)
@@ -36,8 +36,8 @@ class Constructorresults(models.Model):
         db_table = 'constructorResults'
 
 
-class Constructorstandings(models.Model):
-    constructorstandingsid = models.AutoField(db_column='constructorStandingsId', primary_key=True)  # Field name made lowercase.
+class ConstructorStandings(models.Model):
+    id = models.AutoField(db_column='constructorStandingsId', primary_key=True)  # Field name made lowercase.
     raceid = models.ForeignKey('Races', models.DO_NOTHING, db_column='raceId')  # Field name made lowercase.
     constructorid = models.ForeignKey('Constructors', models.DO_NOTHING, db_column='constructorId')  # Field name made lowercase.
     points = models.FloatField()
@@ -51,7 +51,7 @@ class Constructorstandings(models.Model):
 
 
 class Constructors(models.Model):
-    constructorid = models.AutoField(db_column='constructorId', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='constructorId', primary_key=True)  # Field name made lowercase.
     constructorref = models.CharField(db_column='constructorRef', max_length=255)  # Field name made lowercase.
     name = models.CharField(unique=True, max_length=255)
     nationality = models.CharField(max_length=255, blank=True, null=True)
@@ -62,8 +62,8 @@ class Constructors(models.Model):
         db_table = 'constructors'
 
 
-class Driverstandings(models.Model):
-    driverstandingsid = models.AutoField(db_column='driverStandingsId', primary_key=True)  # Field name made lowercase.
+class DriverStandings(models.Model):
+    id = models.AutoField(db_column='driverStandingsId', primary_key=True)  # Field name made lowercase.
     raceid = models.ForeignKey('Races', models.DO_NOTHING, db_column='raceId')  # Field name made lowercase.
     driverid = models.ForeignKey('Drivers', models.DO_NOTHING, db_column='driverId')  # Field name made lowercase.
     points = models.FloatField()
@@ -77,7 +77,7 @@ class Driverstandings(models.Model):
 
 
 class Drivers(models.Model):
-    driverid = models.AutoField(db_column='driverId', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='driverId', primary_key=True)  # Field name made lowercase.
     driverref = models.CharField(db_column='driverRef', max_length=255)  # Field name made lowercase.
     number = models.IntegerField(blank=True, null=True)
     code = models.CharField(max_length=3, blank=True, null=True)
@@ -99,7 +99,6 @@ class Laptimes(models.Model):
     position = models.IntegerField(blank=True, null=True)
     time = models.CharField(max_length=255, blank=True, null=True)
     milliseconds = models.IntegerField(blank=True, null=True)
-    pk = models.AutoField(primary_key=True)
 
     class Meta:
         managed = False
@@ -114,7 +113,6 @@ class Pitstops(models.Model):
     time = models.TimeField()
     duration = models.CharField(max_length=255, blank=True, null=True)
     milliseconds = models.IntegerField(blank=True, null=True)
-    pk = models.AutoField(primary_key=True)
 
     class Meta:
         managed = False
@@ -122,7 +120,7 @@ class Pitstops(models.Model):
 
 
 class Qualifying(models.Model):
-    qualifyid = models.AutoField(db_column='qualifyId', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='qualifyId', primary_key=True)  # Field name made lowercase.
     raceid = models.ForeignKey('Races', models.DO_NOTHING, db_column='raceId')  # Field name made lowercase.
     driverid = models.ForeignKey(Drivers, models.DO_NOTHING, db_column='driverId')  # Field name made lowercase.
     constructorid = models.ForeignKey(Constructors, models.DO_NOTHING, db_column='constructorId')  # Field name made lowercase.
@@ -138,7 +136,7 @@ class Qualifying(models.Model):
 
 
 class Races(models.Model):
-    raceid = models.AutoField(db_column='raceId', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='raceId', primary_key=True)  # Field name made lowercase.
     year = models.IntegerField()
     round = models.IntegerField()
     circuitid = models.ForeignKey(Circuits, models.DO_NOTHING, db_column='circuitId')  # Field name made lowercase.
@@ -163,7 +161,7 @@ class Races(models.Model):
 
 
 class Results(models.Model):
-    resultid = models.AutoField(db_column='resultId', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='resultId', primary_key=True)  # Field name made lowercase.
     raceid = models.ForeignKey(Races, models.DO_NOTHING, db_column='raceId')  # Field name made lowercase.
     driverid = models.ForeignKey(Drivers, models.DO_NOTHING, db_column='driverId')  # Field name made lowercase.
     constructorid = models.ForeignKey(Constructors, models.DO_NOTHING, db_column='constructorId')  # Field name made lowercase.
@@ -196,8 +194,8 @@ class Seasons(models.Model):
         db_table = 'seasons'
 
 
-class Sprintresults(models.Model):
-    sprintresultid = models.AutoField(db_column='sprintResultId', primary_key=True)  # Field name made lowercase.
+class SprintResults(models.Model):
+    id = models.AutoField(db_column='sprintResultId', primary_key=True)  # Field name made lowercase.
     raceid = models.ForeignKey(Races, models.DO_NOTHING, db_column='raceId')  # Field name made lowercase.
     driverid = models.ForeignKey(Drivers, models.DO_NOTHING, db_column='driverId')  # Field name made lowercase.
     constructorid = models.ForeignKey(Constructors, models.DO_NOTHING, db_column='constructorId')  # Field name made lowercase.
@@ -220,7 +218,7 @@ class Sprintresults(models.Model):
 
 
 class Status(models.Model):
-    statusid = models.AutoField(db_column='statusId', primary_key=True)  # Field name made lowercase.
+    id = models.AutoField(db_column='statusId', primary_key=True)  # Field name made lowercase.
     status = models.CharField(max_length=255)
 
     class Meta:
