@@ -3,6 +3,8 @@ from .models import Constructors, Drivers
 from django.db.models import Q
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from rest_framework.reverse import reverse
+
 
 
 
@@ -11,7 +13,6 @@ class DriverSerializer(serializers.ModelSerializer):
     podiums = serializers.SerializerMethodField("get_podiums")
     poles = serializers.SerializerMethodField("get_poles")
     age = serializers.SerializerMethodField("get_current_age")
-    teams = serializers.SerializerMethodField("get_teams")
 
     def get_wins(self, driver: Drivers) -> int:
         """
@@ -26,12 +27,13 @@ class DriverSerializer(serializers.ModelSerializer):
         return temp
 
     def get_podiums(self, driver: Drivers) -> int:
-        """Get number of podiums
+        """
+        Get number of podiums
 
         Args:
             driver (Drivers): driver object
         Returns:
-            int: number of races ended on podium 
+            int: number of races finished on podium 
         """
         temp = driver.results_set.filter(Q(position=1) | Q(position=2) | Q(position=3)).count()
         return temp
@@ -66,33 +68,76 @@ class DriverSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def get_teams(self, driver: Drivers):
-        """
-        Get info about teams driver was racing for each season
-
-        Args:
-            driver (Drivers): driver object
-
-        Returns:
-            list[dict]: list containing dicts in format {"year": ..., "teams": [...]}
-        """
-        temp = driver.results_set.order_by("race__year")
-        return TeamPerSeasonSerializer(temp, many=True, context=self.context).data
-
     class Meta:
         model = Drivers
-        fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "podiums", "wins", "poles", "teams"]
+        fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "podiums", "wins", "poles"]#, "teams"]
+
+
+    def to_representation(self, instance):
+        """
+        Add info about teams driver was racing for each season
+        """
+        representation =  super().to_representation(instance)       # default representation
+        query = instance.results_set.values_list("race__year", "constructor").distinct()
+        years_active = {year for year, constructor in query}        # years of activity in F1 for driver
+        result = {year: [] for year in years_active}
+        
+        for year, constructor in query:
+            constructor_url = reverse("constructor-detail", args=(constructor,))
+            result[year].append(constructor_url)
+        representation["teams"] = result        # add info to representation
+        return representation
 
 
 
 class ConstructorSerializer(serializers.ModelSerializer):
+    wins = serializers.SerializerMethodField()
+    podiums = serializers.SerializerMethodField()
+    poles = serializers.SerializerMethodField()
+
+    def get_wins(self, constructor: Constructors) -> int:
+        """
+        Get number of won races
+
+        Args:
+            constructor (Constructors): constructor object
+
+        Returns:
+            int: number of won races
+        """
+        temp = constructor.results_set.filter(position=1).count()
+        return temp
+
+    def get_podiums(self, constructor: Constructors) -> int:
+        """
+        Get number of podiums
+
+        Args:
+            constructor (Constructors): constructor object
+
+        Returns:
+            int: number of races finished on podium
+        """
+        temp = constructor.results_set\
+            .filter(Q(position=1) | Q(position=2) | Q(position=3)).count()
+        return temp
+
+    def get_poles(self, constructor: Constructors) -> int:
+        """
+        Get number of pole positions won by constructor
+
+        Args:
+            constructor (Constructors): constructor object
+
+        Returns:
+            int: number of pole positions
+        """
+        temp = constructor.qualifying_set.filter(position=1).count()
+        return temp
+
 
     class Meta:
         model = Constructors
-        fields = ["id", "name", "nationality", "url"]
+        fields = ["id", "name", "nationality", "url", "wins", "podiums", "poles"]
 
 
-
-class TeamPerSeasonSerializer(serializers.Serializer):
-    year = serializers.IntegerField(source="race.year")
-    constructor = serializers.HyperlinkedRelatedField(view_name="constructor-detail", read_only=True)
