@@ -3,7 +3,7 @@
 API draft:
 
 ```
-/drivers - ALL methods, additional info about podiums, championships, wins, pole positions, current age
+/drivers - ALL methods, additional info about podiums, championships, wins, pole positions, current age, teams in each year
 
 /constructors - SAME AS ABOVE
 
