@@ -73,19 +73,42 @@ class DriverSerializer(serializers.ModelSerializer):
         fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "podiums", "wins", "poles"]#, "teams"]
 
 
+    def get_teams_info(self, instance) -> dict:
+        """
+        Return dict containing lists of teams driver was racing for per season
+
+        Args:
+            instance (_type_): constructor object
+
+        Returns:
+            dict: dict containing lists of teams driver was racing for per season
+        """
+        query = instance.results_set.values_list("race__year", "constructor").distinct()
+        years_active = {year for year, constructor in query}        # years of activity in F1 for driver
+        result = {year: [] for year in years_active}
+        for year, constructor in query:
+            constructor_url = reverse("constructor-detail", args=(constructor,))
+            result[year].append(constructor_url)
+        return result
+
+    def get_championships_info(self, instance) -> list[int]:
+        """
+        Get list of championship winning seasons for the driver
+
+        Args:
+            instance (_type_): driver object
+
+        Returns:
+            list[int]: list of championship winning seasons
+        """
+        query = instance.results_set.race_set.
+
     def to_representation(self, instance):
         """
         Add info about teams driver was racing for each season
         """
         representation =  super().to_representation(instance)       # default representation
-        query = instance.results_set.values_list("race__year", "constructor").distinct()
-        years_active = {year for year, constructor in query}        # years of activity in F1 for driver
-        result = {year: [] for year in years_active}
-        
-        for year, constructor in query:
-            constructor_url = reverse("constructor-detail", args=(constructor,))
-            result[year].append(constructor_url)
-        representation["teams"] = result        # add info to representation
+        representation["teams"] = self.get_teams_info(instance)        # add info to representation
         return representation
 
 
@@ -135,6 +158,45 @@ class ConstructorSerializer(serializers.ModelSerializer):
         temp = constructor.qualifying_set.filter(position=1).count()
         return temp
 
+    def get_drivers_info(self, instance) -> dict:
+        """
+        Return dict containing lists of drivers racing for the team per year
+
+        Args:
+            instance (_type_): driver object
+
+        Returns:
+            dict: dict containing lists of drivers racing for the team per year
+        """
+        query = instance.results_set.values_list("race__year", "driver").distinct()
+        years_active = {year for year, driver in query}        # years of activity in F1 for driver
+        result = {year: [] for year in years_active}
+        for year, driver in query:
+            driver_url = reverse("driver-detail", args=(driver,))
+            result[year].append(driver_url)
+        return result
+
+    def get_championship_info(self, instance) -> list[int]:
+        """
+        Get list of years when the team won championship(WDC)
+
+        Args:
+            instance (_type_): _description_
+
+        Returns:
+            list[int]: list of championship winning seasons for the team
+        """
+        # query = instance.result_set
+
+
+        return 0
+
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation["drivers"] = self.get_drivers_info(instance)
+        representation["championships"] = self.get_championship_info(instance)
+        return representation
 
     class Meta:
         model = Constructors
