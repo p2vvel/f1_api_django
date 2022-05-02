@@ -1,11 +1,12 @@
+from copyreg import constructor
 from rest_framework import serializers
 from .models import Constructors, Drivers
-from django.db.models import Q
+from django.db.models import Q, Max, Sum
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from rest_framework.reverse import reverse
 
-
+from api.models import DriverStandings, ConstructorStandings
 
 
 class DriverSerializer(serializers.ModelSerializer):
@@ -68,11 +69,6 @@ class DriverSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    class Meta:
-        model = Drivers
-        fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "podiums", "wins", "poles"]#, "teams"]
-
-
     def get_teams_info(self, instance) -> dict:
         """
         Return dict containing lists of teams driver was racing for per season
@@ -91,7 +87,7 @@ class DriverSerializer(serializers.ModelSerializer):
             result[year].append(constructor_url)
         return result
 
-    def get_championships_info(self, instance) -> list[int]:
+    def get_wdc_info(self, instance) -> list[int]:
         """
         Get list of championship winning seasons for the driver
 
@@ -101,7 +97,39 @@ class DriverSerializer(serializers.ModelSerializer):
         Returns:
             list[int]: list of championship winning seasons
         """
-        query = instance.results_set.race_set.
+        try:
+            season_results = DriverStandings.objects.filter(driver=instance)\
+                    .values("race__year").order_by("race__year").annotate(last_round=Max("race__round"))
+            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]    # create all q objects
+            condition = q_filters[0]
+            for q in q_filters[1:]:
+                condition |= q      # merge all q objects into one big condition
+            driver_wdc_position = DriverStandings.objects.filter(driver=instance, position=1).filter(condition).order_by("race__year").values("race__year")
+            return [k["race__year"] for k in driver_wdc_position]
+        except:
+            # return empty list if driver wasnt't classified at the end of the season (e.g. Markus Winkelhock)
+            return []
+
+    def get_points_info(self, instance) -> int | None:
+        """
+        Return info about all points scored by driver during the career
+
+        Args:
+            instance (_type_): driver object
+
+        Returns:
+            int | None: amount of points scored by driver during the whole career
+        """
+        try:
+            season_results = DriverStandings.objects.filter(driver=instance).values("race__year").annotate(last_round=Max("race__round"))
+            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]
+            condition = q_filters[0]
+            for q in q_filters[1:]:
+                condition |= q
+            driver_results = DriverStandings.objects.filter(driver=instance).filter(condition).aggregate(Sum("points"))
+            return driver_results["points__sum"]
+        except:
+            return None
 
     def to_representation(self, instance):
         """
@@ -109,8 +137,13 @@ class DriverSerializer(serializers.ModelSerializer):
         """
         representation =  super().to_representation(instance)       # default representation
         representation["teams"] = self.get_teams_info(instance)        # add info to representation
+        representation["wdc_seasons"] = self.get_wdc_info(instance)
+        representation["points"] = self.get_points_info(instance)
         return representation
 
+    class Meta:
+        model = Drivers
+        fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "podiums", "wins", "poles"]#, "teams"]
 
 
 class ConstructorSerializer(serializers.ModelSerializer):
@@ -186,16 +219,45 @@ class ConstructorSerializer(serializers.ModelSerializer):
         Returns:
             list[int]: list of championship winning seasons for the team
         """
-        # query = instance.result_set
+        try:
+            season_results = ConstructorStandings.objects.filter(constructor=instance).values("race__year").annotate(last_round=Max("race__round"))
+            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]
+            condition = q_filters[0]
+            for q in q_filters[1:]:
+                condition |= q
 
+            team_result = ConstructorStandings.objects.filter(constructor=instance, position=1).filter(condition).order_by("race__year").values("race__year", "position")        
+            return [k["race__year"] for k in team_result]
+        except:
+            return []
+        
+    def get_points_info(self, instance) -> int | None:
+        """
+        Return info about all points scored by driver during the career
 
-        return 0
+        Args:
+            instance (_type_): constructor object
+
+        Returns:
+            int | None: amount of points constructor scored summary
+        """
+        try:
+            season_results = ConstructorStandings.objects.filter(constructor=instance).values("race__year").annotate(last_round=Max("race__round"))
+            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]
+            condition = q_filters[0]
+            for q in q_filters[1:]:
+                condition |= q
+            constructor_results = ConstructorStandings.objects.filter(constructor=instance).filter(condition).aggregate(Sum("points"))
+            return constructor_results["points__sum"]
+        except:
+            return None
 
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation["drivers"] = self.get_drivers_info(instance)
         representation["championships"] = self.get_championship_info(instance)
+        representation["points"] = self.get_points_info(instance)
         return representation
 
     class Meta:
