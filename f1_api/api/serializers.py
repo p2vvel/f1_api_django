@@ -1,6 +1,6 @@
 from copyreg import constructor
 from rest_framework import serializers
-from .models import Constructors, Drivers
+from .models import Circuits, Constructors, Drivers
 from django.db.models import Q, Max, Sum
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -265,3 +265,10 @@ class ConstructorSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "nationality", "url", "wins", "podiums", "poles"]
 
 
+
+
+class CircuitSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Circuits
+        fields = ["name", "location", "country", "lat", "lng", "alt", "url"]

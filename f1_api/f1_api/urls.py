@@ -17,11 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import ConstructorsViewset, DriversViewset
+from api.views import CircuitsViewset, ConstructorsViewset, DriversViewset
 
 router = routers.DefaultRouter()
 router.register(r"drivers", DriversViewset, basename="driver")
 router.register(r"constructors", ConstructorsViewset, basename="constructor")
+router.register(r"circuits", CircuitsViewset, basename="circuit")
 
 
 urlpatterns = [
