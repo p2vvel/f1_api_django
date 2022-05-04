@@ -1,8 +1,10 @@
+from typing import OrderedDict
 from rest_framework import serializers
-from api.models import Constructors
+from api.models import Circuits, Constructors
 from django.db.models import Q, Max, Sum
 from rest_framework.reverse import reverse
 from api.models import ConstructorStandings
+
 
 
 
@@ -10,6 +12,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
     wins = serializers.SerializerMethodField()
     podiums = serializers.SerializerMethodField()
     poles = serializers.SerializerMethodField()
+
 
     def get_wins(self, constructor: Constructors) -> int:
         """
@@ -23,6 +26,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
         """
         temp = constructor.results_set.filter(position=1).count()
         return temp
+
 
     def get_podiums(self, constructor: Constructors) -> int:
         """
@@ -38,6 +42,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
             .filter(Q(position=1) | Q(position=2) | Q(position=3)).count()
         return temp
 
+
     def get_poles(self, constructor: Constructors) -> int:
         """
         Get number of pole positions won by constructor
@@ -51,7 +56,8 @@ class ConstructorSerializer(serializers.ModelSerializer):
         temp = constructor.qualifying_set.filter(position=1).count()
         return temp
 
-    def get_drivers_info(self, instance) -> dict:
+
+    def get_drivers_info(self, instance: Constructors) -> dict[int, list]:
         """
         Return dict containing lists of drivers racing for the team per year
 
@@ -69,7 +75,8 @@ class ConstructorSerializer(serializers.ModelSerializer):
             result[year].append(driver_url)
         return result
 
-    def get_championship_info(self, instance) -> list[int]:
+
+    def get_championship_info(self, instance: Constructors) -> list[int]:
         """
         Get list of years when the team won championship(WDC)
 
@@ -91,7 +98,8 @@ class ConstructorSerializer(serializers.ModelSerializer):
         except:
             return []
         
-    def get_points_info(self, instance) -> int | None:
+
+    def get_points_info(self, instance: Constructors) -> int | None:
         """
         Return info about all points scored by driver during the career
 
@@ -113,12 +121,13 @@ class ConstructorSerializer(serializers.ModelSerializer):
             return None
 
 
-    def to_representation(self, instance):
+    def to_representation(self, instance: Constructors) -> OrderedDict:
         representation = super().to_representation(instance)
         representation["drivers"] = self.get_drivers_info(instance)
         representation["championships"] = self.get_championship_info(instance)
         representation["points"] = self.get_points_info(instance)
         return representation
+
 
     class Meta:
         model = Constructors

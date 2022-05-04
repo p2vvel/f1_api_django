@@ -1,3 +1,4 @@
+from typing import OrderedDict
 from rest_framework import serializers
 from api.models import Drivers
 from django.db.models import Q, Max, Sum
@@ -7,11 +8,14 @@ from rest_framework.reverse import reverse
 from api.models import DriverStandings
 
 
+
+
 class DriverSerializer(serializers.ModelSerializer):
     wins = serializers.SerializerMethodField("get_wins")
     podiums = serializers.SerializerMethodField("get_podiums")
     poles = serializers.SerializerMethodField("get_poles")
     age = serializers.SerializerMethodField("get_current_age")
+
 
     def get_wins(self, driver: Drivers) -> int:
         """
@@ -25,6 +29,7 @@ class DriverSerializer(serializers.ModelSerializer):
         temp = driver.results_set.filter(position=1).count()
         return temp
 
+
     def get_podiums(self, driver: Drivers) -> int:
         """
         Get number of podiums
@@ -36,6 +41,7 @@ class DriverSerializer(serializers.ModelSerializer):
         """
         temp = driver.results_set.filter(Q(position=1) | Q(position=2) | Q(position=3)).count()
         return temp
+
 
     def get_poles(self, driver: Drivers) -> int:
         """
@@ -49,6 +55,7 @@ class DriverSerializer(serializers.ModelSerializer):
         """
         temp = driver.qualifying_set.filter(position=1).count()
         return temp
+
 
     def get_current_age(self, driver: Drivers) -> int | None:
         """
@@ -67,7 +74,8 @@ class DriverSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def get_teams_info(self, instance) -> dict:
+
+    def get_teams_info(self, instance: Drivers) -> dict[int, list]:
         """
         Return dict containing lists of teams driver was racing for per season
 
@@ -85,7 +93,8 @@ class DriverSerializer(serializers.ModelSerializer):
             result[year].append(constructor_url)
         return result
 
-    def get_wdc_info(self, instance) -> list[int]:
+
+    def get_wdc_info(self, instance: Drivers) -> list[int]:
         """
         Get list of championship winning seasons for the driver
 
@@ -108,7 +117,8 @@ class DriverSerializer(serializers.ModelSerializer):
             # return empty list if driver wasnt't classified at the end of the season (e.g. Markus Winkelhock)
             return []
 
-    def get_points_info(self, instance) -> int | None:
+
+    def get_points_info(self, instance: Drivers) -> int | None:
         """
         Return info about all points scored by driver during the career
 
@@ -129,7 +139,8 @@ class DriverSerializer(serializers.ModelSerializer):
         except:
             return None
 
-    def to_representation(self, instance):
+
+    def to_representation(self, instance: Drivers) -> OrderedDict:
         """
         Add info about teams driver was racing for each season
         """
@@ -138,6 +149,7 @@ class DriverSerializer(serializers.ModelSerializer):
         representation["wdc_seasons"] = self.get_wdc_info(instance)
         representation["points"] = self.get_points_info(instance)
         return representation
+
 
     class Meta:
         model = Drivers

@@ -1,3 +1,5 @@
 from .circuit_serializer import CircuitSerializer
 from .constructor_serializer import ConstructorSerializer
 from .driver_serializer import DriverSerializer
+from .race_serializer import RaceSerializer
+from .season_serializer import SeasonSerializer
