@@ -172,5 +172,3 @@ CACHES = {
         'LOCATION': 'redis://127.0.0.1:8090',
     }
 }
-
-from rest_framework.permissions import Re
