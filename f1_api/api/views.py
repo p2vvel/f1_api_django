@@ -6,23 +6,23 @@ from api.serializers import DriverSerializer, ConstructorSerializer, CircuitSeri
 from api.throttling import ViewThrottle
 
 
-class DriversViewset(viewsets.ModelViewSet, ViewThrottle):
+class DriversViewset(viewsets.ReadOnlyModelViewSet, ViewThrottle):
     queryset = Drivers.objects.all()
     serializer_class = DriverSerializer
 
 
-class ConstructorsViewset(viewsets.ModelViewSet, ViewThrottle):
+class ConstructorsViewset(viewsets.ReadOnlyModelViewSet, ViewThrottle):
     queryset = Constructors.objects.all()
     serializer_class = ConstructorSerializer
 
-class CircuitsViewset(viewsets.ModelViewSet, ViewThrottle):
+class CircuitsViewset(viewsets.ReadOnlyModelViewSet, ViewThrottle):
     queryset = Circuits.objects.all()
     serializer_class = CircuitSerializer
 
-class RacesViewset(viewsets.ModelViewSet, ViewThrottle):
+class RacesViewset(viewsets.ReadOnlyModelViewSet, ViewThrottle):
     queryset = Races.objects.all()
     serializer_class = RaceSerializer
 
-class SeasonsViewset(viewsets.ModelViewSet, ViewThrottle):
+class SeasonsViewset(viewsets.ReadOnlyModelViewSet, ViewThrottle):
     queryset = Seasons.objects.all()
     serializer_class = SeasonSerializer
