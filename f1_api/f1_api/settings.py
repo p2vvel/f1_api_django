@@ -51,9 +51,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     # 'django.middleware.common.CommonMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'f1_api.urls'
@@ -141,34 +141,54 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-       'rest_framework.authentication.TokenAuthentication',
-   ),
-
-   'DEFAULT_THROTTLE_CLASSES': [
-        'api.throttling.AnonBurstThrottle',
-        'api.throttling.AnonSustainedThrottle',
-        'api.throttling.UserBurstThrottle',
-        'api.throttling.UserSustainedThrottle',
-        # 'rest_framework.throttling.ScopedRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        "anon_burst": "6/min",
-        "anon_sustained": "1000/day",
-        "user_burst": "10/min",
-        "user_sustained": "10000/day",
-    },
-}
-
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
         'LOCATION': 'redis://127.0.0.1:8090',
     }
 }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.TokenAuthentication',
+   ),
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '2/minute',
+        'user': '2/minute'
+    }
+}
+
+#    'DEFAULT_THROTTLE_CLASSES': [
+#         'rest_framework.throttling.AnonRateThrottle',
+#         # 'rest_framework.throttling.UserRateThrottle'
+#     ],
+#     'DEFAULT_THROTTLE_RATES': {
+#         'anon': '10/min',
+#         # 'user': '100/day'
+#     }
+#    'DEFAULT_THROTTLE_CLASSES': [
+#         'api.throttling.AnonBurstThrottle',
+#         'api.throttling.AnonSustainedThrottle',
+#         'api.throttling.UserBurstThrottle',
+#         'api.throttling.UserSustainedThrottle',
+#         # 'rest_framework.throttling.ScopedRateThrottle',
+#     ],
+#     'DEFAULT_THROTTLE_RATES': {
+#         "anon_burst": "6/minute",
+#         "anon_sustained": "1000/day",
+#         "user_burst": "10/minute",
+#         "user_sustained": "10000/day",
+#     },
+# }
+

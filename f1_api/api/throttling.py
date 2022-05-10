@@ -16,12 +16,12 @@ class UserSustainedThrottle(UserRateThrottle):
 
 
 
-class ViewThrottle:
-    """
-    Class defining throttle rates for views, must be inherited by them (views)
-    """
-    throttle_classes = [
-        AnonBurstThrottle, 
-        AnonSustainedThrottle,
-        UserBurstThrottle,
-        UserSustainedThrottle]
+# class ViewThrottle:
+#     """
+#     Class defining throttle rates for views, must be inherited by them (views)
+#     """
+#     throttle_classes = [
+#         AnonBurstThrottle, 
+#         AnonSustainedThrottle,
+#         UserBurstThrottle,
+#         UserSustainedThrottle]
