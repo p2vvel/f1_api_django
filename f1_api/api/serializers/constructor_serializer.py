@@ -7,11 +7,11 @@ from api.models import ConstructorStandings
 
 
 
-
 class ConstructorSerializer(serializers.ModelSerializer):
     wins = serializers.SerializerMethodField()
     podiums = serializers.SerializerMethodField()
     poles = serializers.SerializerMethodField()
+
 
 
     def get_wins(self, constructor: Constructors) -> int:

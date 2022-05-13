@@ -1,18 +1,16 @@
 from typing import OrderedDict
 from rest_framework import serializers
 from api.models import Drivers
-from django.db.models import Q, Max, Sum
+from django.db.models import Q, Max, Sum, Count
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from rest_framework.reverse import reverse
 from api.models import DriverStandings
 
 
-
+from api.utils import q_or
 
 class DriverSerializer(serializers.ModelSerializer):
-    wins = serializers.SerializerMethodField("get_wins")
-    podiums = serializers.SerializerMethodField("get_podiums")
     poles = serializers.SerializerMethodField("get_poles")
     age = serializers.SerializerMethodField("get_current_age")
 
@@ -26,8 +24,7 @@ class DriverSerializer(serializers.ModelSerializer):
         Returns:
             int: number won races
         """
-        temp = driver.results_set.filter(position=1).count()
-        return temp
+        return self.podiums_data.get("1", 0)
 
 
     def get_podiums(self, driver: Drivers) -> int:
@@ -39,8 +36,7 @@ class DriverSerializer(serializers.ModelSerializer):
         Returns:
             int: number of races finished on podium 
         """
-        temp = driver.results_set.filter(Q(position=1) | Q(position=2) | Q(position=3)).count()
-        return temp
+        return sum(self.podiums_data.values())
 
 
     def get_poles(self, driver: Drivers) -> int:
@@ -53,8 +49,8 @@ class DriverSerializer(serializers.ModelSerializer):
         Returns:
             int: amount of won pole positions
         """
-        temp = driver.qualifying_set.filter(position=1).count()
-        return temp
+        return driver.qualifying_set.filter(position=1).count()
+        # return self.podiums.get("1", 0)
 
 
     def get_current_age(self, driver: Drivers) -> int | None:
@@ -105,17 +101,10 @@ class DriverSerializer(serializers.ModelSerializer):
             list[int]: list of championship winning seasons
         """
         try:
-            season_results = DriverStandings.objects.filter(driver=instance)\
-                    .values("race__year").order_by("race__year").annotate(last_round=Max("race__round"))
-            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]    # create all q objects
-            condition = q_filters[0]
-            for q in q_filters[1:]:
-                condition |= q      # merge all q objects into one big condition
-            driver_wdc_position = DriverStandings.objects.filter(driver=instance, position=1).filter(condition).order_by("race__year").values("race__year")
+            driver_wdc_position = DriverStandings.objects.filter(driver=instance, position=1).filter(self.condition).order_by("race__year").values("race__year")
             return [k["race__year"] for k in driver_wdc_position]
         except:
-            # return empty list if driver wasnt't classified at the end of the season (e.g. Markus Winkelhock)
-            return []
+            return []   # return empty list if driver wasnt't classified at the end of the season (e.g. Markus Winkelhock)
 
 
     def get_points_info(self, instance: Drivers) -> int | None:
@@ -129,12 +118,7 @@ class DriverSerializer(serializers.ModelSerializer):
             int | None: amount of points scored by driver during the whole career
         """
         try:
-            season_results = DriverStandings.objects.filter(driver=instance).values("race__year").annotate(last_round=Max("race__round"))
-            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]
-            condition = q_filters[0]
-            for q in q_filters[1:]:
-                condition |= q
-            driver_results = DriverStandings.objects.filter(driver=instance).filter(condition).aggregate(Sum("points"))
+            driver_results = DriverStandings.objects.filter(driver=instance).filter(self.condition).aggregate(Sum("points"))
             return driver_results["points__sum"]
         except:
             return None
@@ -145,12 +129,27 @@ class DriverSerializer(serializers.ModelSerializer):
         Add info about teams driver was racing for each season
         """
         representation =  super().to_representation(instance)       # default representation
+        
+        self.season_results = DriverStandings.objects.filter(driver=instance)\
+                     .values("race__year").order_by("race__year").annotate(last_round=Max("race__round"))
+        self.condition = q_or([Q(race__round=k["last_round"], race__year=k["race__year"]) for k in self.season_results])
+
+
+        podiums_data = instance.results_set.filter(Q(position=1) | Q(position=2) | Q(position=3)).values("position").annotate(count=Count("position")).order_by("position")
+        self.podiums_data = {k["position"]: k["count"] for k in podiums_data}
+
+
+
+        representation["wins"] = self.get_wins(instance)
+        representation["podiums"] = self.get_podiums(instance)
         representation["teams"] = self.get_teams_info(instance)        # add info to representation
         representation["wdc_seasons"] = self.get_wdc_info(instance)
         representation["points"] = self.get_points_info(instance)
         return representation
 
 
+
+
     class Meta:
         model = Drivers
-        fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "podiums", "wins", "poles"]#, "teams"]
+        fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "poles"]#, "teams"]
