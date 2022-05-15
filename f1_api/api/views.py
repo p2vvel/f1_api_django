@@ -11,23 +11,52 @@ class DriversViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewS
     queryset = Drivers.objects.all()
     serializer_class = DriverSerializer
 
-    filterset_fields = ["surname", "forename", "nationality"]
-    search_fields = ["surname", "forename"]
-    ordering_fields = ["name", "surname", ""]
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    basic_fields = ["surname", "forename", "nationality", "code", "number", "dob"]
+    filterset_fields = basic_fields 
+    search_fields = basic_fields
+    ordering_fields = basic_fields
+
 
 class ConstructorsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Constructors.objects.all()
     serializer_class = ConstructorSerializer
 
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    basic_fields = ["name", "nationality"]
+    filterset_fields = basic_fields 
+    search_fields = basic_fields
+    ordering_fields = basic_fields
+
+
 class CircuitsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Circuits.objects.all()
     serializer_class = CircuitSerializer
 
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    basic_fields = ["name", "location", "country", "lat", "lng", "alt"]
+    filterset_fields = basic_fields 
+    search_fields = basic_fields
+    ordering_fields = basic_fields
+
+
 class RacesViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Races.objects.all()
     serializer_class = RaceSerializer
+    
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    basic_fields = ["name", "year", "round", "date"]
+    filterset_fields = basic_fields 
+    search_fields = basic_fields
+    ordering_fields = basic_fields
+
 
 class SeasonsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Seasons.objects.all()
     serializer_class = SeasonSerializer
+
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    basic_fields = ["year"]
+    filterset_fields = basic_fields 
+    search_fields = basic_fields
+    ordering_fields = basic_fields
