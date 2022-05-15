@@ -6,13 +6,15 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from rest_framework.reverse import reverse
 from api.models import DriverStandings
-
-
 from api.utils import q_or
 
+
+
 class DriverSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name="driver-detail")
     poles = serializers.SerializerMethodField("get_poles")
     age = serializers.SerializerMethodField("get_current_age")
+    wiki_url = serializers.URLField(source="url")
 
 
     def get_wins(self, driver: Drivers) -> int:
@@ -50,7 +52,6 @@ class DriverSerializer(serializers.ModelSerializer):
             int: amount of won pole positions
         """
         return driver.qualifying_set.filter(position=1).count()
-        # return self.podiums.get("1", 0)
 
 
     def get_current_age(self, driver: Drivers) -> int | None:
@@ -126,19 +127,15 @@ class DriverSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance: Drivers) -> OrderedDict:
         """
-        Add info about teams driver was racing for each season
+        Add extra fields to serializer
         """
         representation =  super().to_representation(instance)       # default representation
         
-        self.season_results = DriverStandings.objects.filter(driver=instance)\
+        season_results = DriverStandings.objects.filter(driver=instance)\
                      .values("race__year").order_by("race__year").annotate(last_round=Max("race__round"))
-        self.condition = q_or([Q(race__round=k["last_round"], race__year=k["race__year"]) for k in self.season_results])
-
-
+        self.condition = q_or([Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results])
         podiums_data = instance.results_set.filter(Q(position=1) | Q(position=2) | Q(position=3)).values("position").annotate(count=Count("position")).order_by("position")
         self.podiums_data = {k["position"]: k["count"] for k in podiums_data}
-
-
 
         representation["wins"] = self.get_wins(instance)
         representation["podiums"] = self.get_podiums(instance)
@@ -148,8 +145,6 @@ class DriverSerializer(serializers.ModelSerializer):
         return representation
 
 
-
-
     class Meta:
         model = Drivers
-        fields = ["code", "number", "forename", "surname", "age", "dob", "nationality", "url", "poles"]#, "teams"]
+        fields = ["url", "code", "number", "forename", "surname", "age", "dob", "nationality", "wiki_url", "poles"]#, "teams"]

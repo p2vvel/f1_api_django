@@ -2,10 +2,12 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from typing import Callable
 
-def process_request_or_cache(throttled_function: Callable[..., Response], request, timeout: int=60*60,*args, **kwargs) -> Response:
+
+
+def process_request_or_cache(throttled_function: Callable[..., Response], request, timeout: int=2,*args, **kwargs) -> Response:
     """
     Check if result of function given as parameter has already been cached,
-    if yes, return cache reponse with cache content, else - save function 
+    if yes, return reponse with cache content, else - save function 
     result to cache and return response with this data
 
     Args:

@@ -18,9 +18,9 @@ API draft:
 Extra:
 * token authorization
 * throttling
-* sorting
-* filtering
 * paging
+* sorting
 * status codes
+* filtering
 * format choose (json/yaml)
 * oauth
