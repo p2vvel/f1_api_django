@@ -2,7 +2,7 @@ from django.core.cache import cache
 from rest_framework.response import Response
 from typing import Callable
 
-def process_request_or_cache(throttled_function: Callable[..., Response], request, *args, **kwargs) -> Response:
+def process_request_or_cache(throttled_function: Callable[..., Response], request, timeout: int=60*60,*args, **kwargs) -> Response:
     """
     Check if result of function given as parameter has already been cached,
     if yes, return cache reponse with cache content, else - save function 
@@ -15,7 +15,7 @@ def process_request_or_cache(throttled_function: Callable[..., Response], reques
     Returns:
         Response: result of given function - processed or retrieved from cache
     """
-    url_path = request.get_full_path()      # get request url (used as cache key)
+    url_path = request.get_full_path()      # request url (used as cache key)
     cache_data = cache.get(url_path)        # try fetching data from cache
     if cache_data:
         # return Response with data from cache
@@ -23,7 +23,7 @@ def process_request_or_cache(throttled_function: Callable[..., Response], reques
     else:
         # data not found in cache - save it
         response = throttled_function(request, *args, **kwargs)
-        cache.set(url_path, response.data)                  # cache result
+        cache.set(url_path, response.data, timeout=timeout)                  # cache result
         return response         # return requested data
 
 
