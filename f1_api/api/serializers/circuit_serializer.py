@@ -7,6 +7,7 @@ from rest_framework.reverse import reverse
 class CircuitSerializer(serializers.ModelSerializer):
     races = serializers.SerializerMethodField(method_name="get_races")
 
+
     def get_races(self, instance: Circuits) -> dict[int, list]:
         """
         Get list of races organized on the circuit
@@ -25,6 +26,7 @@ class CircuitSerializer(serializers.ModelSerializer):
             url = reverse("race-detail", args=(r.pk,))
             result[year].append(url)
         return result
+
 
     class Meta:
         model = Circuits
