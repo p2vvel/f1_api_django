@@ -1,8 +1,9 @@
 from copyreg import constructor
 from rest_framework import serializers
-from api.models import ConstructorStandings, Constructors, DriverStandings, Drivers, Races, Seasons
+from api.models import ConstructorStandings, DriverStandings, Races, Seasons, Results
 from rest_framework.reverse import reverse
 from django.db.models import Max
+
 
 
 class SeasonSerializer(serializers.ModelSerializer):
@@ -50,6 +51,7 @@ class SeasonSerializer(serializers.ModelSerializer):
             print(e)
             return []
 
+
     def get_constructors(self, instance: Seasons) -> list[str]:
         """
         Get list of teams in the season, ordered by positions in wcc
@@ -61,16 +63,24 @@ class SeasonSerializer(serializers.ModelSerializer):
             list[str]: list of urls to constructors racing during the season, ordered by the position in the wcc
         """
         try:
-            last_round_query = DriverStandings.objects.filter(race__year=instance.year).aggregate(Max("race__round"))
-            last_round = last_round_query["race__round__max"]
-            
-            constructors_standings = ConstructorStandings.objects.filter(race__round=last_round, race__year=instance.year).order_by("position").values("constructor__pk")
-            # constructors_urls = [reverse("constructor-detail", args=(c["constructor__pk"],)) for c in constructors_standings]
-            constructors_urls = [Constructors.objects.get(pk=c["constructor__pk"]).name for c in constructors_standings]
-            return constructors_urls
-            pass
+            # The Constructors Championship was not awarded until 1958:
+            if instance.year >= 1958:
+                last_round_query = DriverStandings.objects.filter(race__year=instance.year).aggregate(Max("race__round"))
+                last_round = last_round_query["race__round__max"]
+                
+                constructors_standings = ConstructorStandings.objects.filter(race__round=last_round, race__year=instance.year).order_by("position").values("constructor__pk")
+                constructors_urls = [reverse("constructor-detail", args=(c["constructor__pk"],)) for c in constructors_standings]
+                # constructors_urls = [Constructors.objects.get(pk=c["constructor__pk"]).name for c in constructors_standings]
+                return constructors_urls
+            else:
+                # list constructors alphabetically
+                teams_query = Results.objects.filter(race__year=1950).order_by("constructor__name").values("constructor", "constructor__name").distinct()
+                teams_urls = [reverse("constructor-detail", args=(t.get("constructor"),)) for t in teams_query]
+                return teams_urls
         except Exception as e:
+            print(e)
             return []
+
 
     class Meta:
         model = Seasons
