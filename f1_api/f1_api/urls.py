@@ -19,6 +19,7 @@ from rest_framework import routers
 
 from api.views import CircuitsViewset, ConstructorsViewset, DriversViewset, RacesViewset, SeasonsViewset
 
+# format choice is automatically implemented in router (no need to use format_suffix_patterns())
 router = routers.DefaultRouter()
 router.register(r"drivers", DriversViewset, basename="driver")
 router.register(r"constructors", ConstructorsViewset, basename="constructor")

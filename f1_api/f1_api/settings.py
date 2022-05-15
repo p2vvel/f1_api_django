@@ -152,7 +152,7 @@ CACHES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20000,
+    'PAGE_SIZE': 50,
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
@@ -167,7 +167,16 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '60/minute',
         'user': '600/minute'
-    }
+    },
+    # default JSON only, yaml added manually:
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework_yaml.parsers.YAMLParser',
+        'rest_framework.parsers.JSONParser',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework_yaml.renderers.YAMLRenderer',
+        'rest_framework.renderers.JSONRenderer',
+    ),
 }
 
 #    'DEFAULT_THROTTLE_CLASSES': [

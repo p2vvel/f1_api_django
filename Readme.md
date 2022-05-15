@@ -20,7 +20,6 @@ Extra:
 * throttling
 * paging
 * sorting
-* status codes
 * filtering
 * format choose (json/yaml)
 * oauth
