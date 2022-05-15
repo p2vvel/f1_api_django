@@ -27,7 +27,10 @@ def process_request_or_cache(throttled_function: Callable[..., Response], reques
         return response         # return requested data
 
 
-class ReadOnlyThrottledMixin:
+class ReadOnlyModelViewsetCacheMixin:
+    """
+    Mixin used for caching of ReadOnlyModelViewsets requests
+    """
     def list(self, request, *args, **kwargs):
         return process_request_or_cache(super().list, request, *args, **kwargs)
 
