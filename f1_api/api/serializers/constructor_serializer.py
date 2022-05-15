@@ -1,17 +1,16 @@
 from typing import OrderedDict
 from rest_framework import serializers
-from api.models import Circuits, Constructors
+from api.models import Constructors
 from django.db.models import Q, Max, Sum
 from rest_framework.reverse import reverse
 from api.models import ConstructorStandings
+from django.db.models import Count
+from api.utils import q_or
 
 
 
 class ConstructorSerializer(serializers.ModelSerializer):
-    wins = serializers.SerializerMethodField()
-    podiums = serializers.SerializerMethodField()
     poles = serializers.SerializerMethodField()
-
 
 
     def get_wins(self, constructor: Constructors) -> int:
@@ -24,8 +23,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
         Returns:
             int: number of won races
         """
-        temp = constructor.results_set.filter(position=1).count()
-        return temp
+        return self.podiums_data.get("1", 0)
 
 
     def get_podiums(self, constructor: Constructors) -> int:
@@ -38,9 +36,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
         Returns:
             int: number of races finished on podium
         """
-        temp = constructor.results_set\
-            .filter(Q(position=1) | Q(position=2) | Q(position=3)).count()
-        return temp
+        return sum(self.podiums_data.values())
 
 
     def get_poles(self, constructor: Constructors) -> int:
@@ -87,13 +83,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
             list[int]: list of championship winning seasons for the team
         """
         try:
-            season_results = ConstructorStandings.objects.filter(constructor=instance).values("race__year").annotate(last_round=Max("race__round"))
-            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]
-            condition = q_filters[0]
-            for q in q_filters[1:]:
-                condition |= q
-
-            team_result = ConstructorStandings.objects.filter(constructor=instance, position=1).filter(condition).order_by("race__year").values("race__year", "position")        
+            team_result = ConstructorStandings.objects.filter(constructor=instance, position=1).filter(self.condition).order_by("race__year").values("race__year", "position")        
             return [k["race__year"] for k in team_result]
         except:
             return []
@@ -110,19 +100,26 @@ class ConstructorSerializer(serializers.ModelSerializer):
             int | None: amount of points constructor scored summary
         """
         try:
-            season_results = ConstructorStandings.objects.filter(constructor=instance).values("race__year").annotate(last_round=Max("race__round"))
-            q_filters = [Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results]
-            condition = q_filters[0]
-            for q in q_filters[1:]:
-                condition |= q
-            constructor_results = ConstructorStandings.objects.filter(constructor=instance).filter(condition).aggregate(Sum("points"))
+            constructor_results = ConstructorStandings.objects.filter(constructor=instance).filter(self.condition).aggregate(Sum("points"))
             return constructor_results["points__sum"]
         except:
             return None
 
 
     def to_representation(self, instance: Constructors) -> OrderedDict:
+        """
+        Add extra fields to serializer
+        """
         representation = super().to_representation(instance)
+
+        season_results = ConstructorStandings.objects.filter(constructor=instance).\
+            values("race__year").annotate(last_round=Max("race__round"))
+        self.condition = q_or([Q(race__round=k["last_round"], race__year=k["race__year"]) for k in season_results])
+        podiums_data = instance.results_set.filter(Q(position=1) | Q(position=2) | Q(position=3)).values("position").annotate(count=Count("position")).order_by("position")
+        self.podiums_data = {k["position"]: k["count"] for k in podiums_data}
+
+        representation["wins"] = self.get_wins(instance)
+        representation["podiums"] = self.get_podiums(instance)
         representation["drivers"] = self.get_drivers_info(instance)
         representation["championships"] = self.get_championship_info(instance)
         representation["points"] = self.get_points_info(instance)
@@ -131,5 +128,5 @@ class ConstructorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Constructors
-        fields = ["id", "name", "nationality", "url", "wins", "podiums", "poles"]
+        fields = ["id", "name", "nationality", "url", "poles"]
 
