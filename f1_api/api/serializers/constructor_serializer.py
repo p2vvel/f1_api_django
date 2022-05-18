@@ -63,7 +63,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
         Returns:
             dict: dict containing lists of drivers racing for the team per year
         """
-        query = instance.results_set.values_list("race__year", "driver").distinct()
+        query = instance.results_set.values_list("race__year", "driver__driverref").distinct()
         years_active = {year for year, driver in query}        # years of activity in F1 for driver
         result = {year: [] for year in years_active}
         for year, driver in query:

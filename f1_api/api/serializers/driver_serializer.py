@@ -1,3 +1,4 @@
+from cgitb import lookup
 from typing import OrderedDict
 from rest_framework import serializers
 from api.models import Drivers
@@ -11,7 +12,7 @@ from api.utils import q_or
 
 
 class DriverSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name="driver-detail")
+    url = serializers.HyperlinkedIdentityField(view_name="driver-detail", lookup_field="driverref")
     poles = serializers.SerializerMethodField("get_poles")
     age = serializers.SerializerMethodField("get_current_age")
     wiki_url = serializers.URLField(source="url")
@@ -147,4 +148,4 @@ class DriverSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Drivers
-        fields = ["url", "code", "number", "forename", "surname", "age", "dob", "nationality", "wiki_url", "poles"]#, "teams"]
+        fields = ["url", "code", "number", "forename", "surname", "age", "dob", "nationality", "wiki_url", "poles"]

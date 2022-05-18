@@ -21,7 +21,7 @@ class RaceSerializer(serializers.ModelSerializer):
         """
         try:
             results = Results.objects.filter(race=instance).order_by("positionorder")
-            drivers = [r.driver for r in results]
+            drivers = [r.driver.driverref for r in results]
             drivers_urls = [reverse("driver-detail", args=(d.pk,)) for d in drivers]
             return drivers_urls
         except:

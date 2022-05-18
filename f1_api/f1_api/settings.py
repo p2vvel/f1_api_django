@@ -170,12 +170,12 @@ REST_FRAMEWORK = {
     },
     # default JSON only, yaml added manually:
     'DEFAULT_PARSER_CLASSES': (
-        'rest_framework_yaml.parsers.YAMLParser',
         'rest_framework.parsers.JSONParser',
+        'rest_framework_yaml.parsers.YAMLParser',
     ),
     'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework_yaml.renderers.YAMLRenderer',
         'rest_framework.renderers.JSONRenderer',
+        'rest_framework_yaml.renderers.YAMLRenderer',
     ),
 }
 

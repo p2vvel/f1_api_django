@@ -10,6 +10,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 class DriversViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Drivers.objects.all()
     serializer_class = DriverSerializer
+    lookup_field = "driverref"
 
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     basic_fields = ["surname", "forename", "nationality", "code", "number", "dob"]

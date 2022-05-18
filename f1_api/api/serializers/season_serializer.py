@@ -44,8 +44,8 @@ class SeasonSerializer(serializers.ModelSerializer):
             last_round_query = DriverStandings.objects.filter(race__year=instance.year).aggregate(Max("race__round"))
             last_round = last_round_query["race__round__max"]
             
-            drivers_standings = DriverStandings.objects.filter(race__round=last_round, race__year=instance.year).order_by("position").values("driver__pk")
-            drivers_urls = [reverse("driver-detail", args=(d["driver__pk"],)) for d in drivers_standings]
+            drivers_standings = DriverStandings.objects.filter(race__round=last_round, race__year=instance.year).order_by("position").values("driver__driverref")
+            drivers_urls = [reverse("driver-detail", args=(d["driver__driverref"],)) for d in drivers_standings]
             return drivers_urls
         except Exception as e:
             print(e)
