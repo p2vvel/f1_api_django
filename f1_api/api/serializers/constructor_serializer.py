@@ -10,6 +10,7 @@ from api.utils import q_or
 
 
 class ConstructorSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(view_name="constructor-detail", lookup_field="constructorref")
     poles = serializers.SerializerMethodField()
 
 
@@ -87,7 +88,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
             return [k["race__year"] for k in team_result]
         except:
             return []
-        
+
 
     def get_points_info(self, instance: Constructors) -> int | None:
         """
@@ -128,5 +129,5 @@ class ConstructorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Constructors
-        fields = ["id", "name", "nationality", "url", "poles"]
+        fields = ["url", "name", "nationality", "url", "poles"]
 

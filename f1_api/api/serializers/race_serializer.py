@@ -41,7 +41,7 @@ class RaceSerializer(serializers.ModelSerializer):
         try:
             results = ConstructorResults.objects.filter(race=instance).order_by("-points")
             constructors = [r.constructor for r in results]
-            constructors_urls = [reverse("constructor-detail", args=(c.pk,)) for c in constructors]
+            constructors_urls = [reverse("constructor-detail", args=(c.constructorref,)) for c in constructors]
             return constructors_urls
         except:
             return []

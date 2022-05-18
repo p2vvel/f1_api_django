@@ -22,6 +22,7 @@ class DriversViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewS
 class ConstructorsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Constructors.objects.all()
     serializer_class = ConstructorSerializer
+    lookup_field = "constructorref"
 
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     basic_fields = ["name", "nationality"]
