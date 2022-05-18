@@ -24,7 +24,7 @@ class SeasonSerializer(serializers.ModelSerializer):
         """
         try:
             races = Races.objects.filter(year=instance.year).order_by("round")
-            races_urls = [reverse("race-detail", args=(r.pk,)) for r in races]
+            races_urls = [reverse("race-detail", args=(r.year, r.round)) for r in races]
             return races_urls
         except:
             return []

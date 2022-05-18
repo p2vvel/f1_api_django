@@ -23,7 +23,8 @@ class CircuitSerializer(serializers.ModelSerializer):
         result = {y:[] for y in years}      # dict in format {year:[list, of, races]}
         for i, r in enumerate(races):
             year = r.year
-            url = reverse("race-detail", args=(r.pk,))
+            url = reverse("race-detail", args=(r.year, r.round))
+            url = ""
             result[year].append(url)
         return result
 

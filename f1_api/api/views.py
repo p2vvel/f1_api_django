@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from api.models import Circuits, Drivers, Constructors, Races, Seasons
 from api.serializers import DriverSerializer, ConstructorSerializer, CircuitSerializer, RaceSerializer, SeasonSerializer
-from api.mixins import ReadOnlyModelViewsetCacheMixin
+from api.mixins import ReadOnlyModelViewsetCacheMixin, MultipleFieldsQueryset
 
 from django_filters.rest_framework.backends import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -31,9 +31,11 @@ class ConstructorsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModel
     ordering_fields = basic_fields
 
 
+
 class CircuitsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Circuits.objects.all()
     serializer_class = CircuitSerializer
+    lookup_field = "circuitref"
 
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     basic_fields = ["name", "location", "country", "lat", "lng", "alt"]
@@ -42,15 +44,17 @@ class CircuitsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelView
     ordering_fields = basic_fields
 
 
-class RacesViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
+class RacesViewset(MultipleFieldsQueryset, ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Races.objects.all()
     serializer_class = RaceSerializer
-    
+    lookup_field = ["year", "round"]
+
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
     basic_fields = ["name", "year", "round", "date"]
     filterset_fields = basic_fields 
     search_fields = basic_fields
     ordering_fields = basic_fields
+    ordering = ["-year", "-round"]
 
 
 class SeasonsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewSet):
@@ -62,3 +66,4 @@ class SeasonsViewset(ReadOnlyModelViewsetCacheMixin, viewsets.ReadOnlyModelViewS
     filterset_fields = basic_fields 
     search_fields = basic_fields
     ordering_fields = basic_fields
+    ordering = "-year"
