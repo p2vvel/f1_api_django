@@ -1,6 +1,30 @@
-{% extends 'base.html' %}
-
-
+{% extends "base.html" %}
 {% block content %}
-PANEL
+
+    {% if tokens %}
+    <table class="table">
+        <thead class="table-dark">
+            <th>Created</th>
+            <th>Key</th>
+            <th>Delete</th>
+            </thead>
+            <tbody>
+                <form action="{% url 'delete_token' %}" method="post">
+                    {% csrf_token %}
+                    {% for token in tokens %}
+                    <tr>
+                        <td>{{ token.created }}</td>
+                        <td>{{ token.key }}</td>
+                        <td>
+                            <button name="token_pk" class="btn btn-outline-danger" value={{ token.pk }}>X</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </form>
+            </tbody>
+        </table>
+    {% else %}
+        <a class="btn btn-outline-primary" href="{% url 'create_token' %}">Create Token</a>
+    {% endif %}
+
 {% endblock content %}

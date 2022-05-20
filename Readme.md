@@ -11,7 +11,8 @@ API draft:
 
 /seasons - GET, additional info about all races, drivers, teams, WDC and WCC info
 
-/race - GET, additional info about drivers, teams, quali and race results
+/race - GET, additional info about drive<div class="container">
+rs, teams, quali and race results
 
 ```
 
@@ -21,5 +22,4 @@ Extra:
 * paging
 * sorting
 * filtering
-* format choose (json/yaml)
-* oauth
+* format choice (json/yaml)
