@@ -24,7 +24,6 @@ class CircuitSerializer(serializers.ModelSerializer):
         for i, r in enumerate(races):
             year = r.year
             url = reverse("race-detail", args=(r.year, r.round))
-            url = ""
             result[year].append(url)
         return result
 

@@ -25,7 +25,7 @@ class RaceSerializer(serializers.ModelSerializer):
         try:
             results = Results.objects.filter(race=instance).order_by("positionorder")
             drivers = [r.driver.driverref for r in results]
-            drivers_urls = [reverse("driver-detail", args=(d.pk,)) for d in drivers]
+            drivers_urls = [reverse("driver-detail", args=(d,)) for d in drivers]
             return drivers_urls
         except:
             return []
@@ -43,11 +43,12 @@ class RaceSerializer(serializers.ModelSerializer):
         """
         try:
             results = ConstructorResults.objects.filter(race=instance).order_by("-points")
-            constructors = [r.constructor for r in results]
-            constructors_urls = [reverse("constructor-detail", args=(c.constructorref,)) for c in constructors]
+            constructors = [r.constructor.constructorref for r in results]
+            constructors_urls = [reverse("constructor-detail", args=(c,)) for c in constructors]
             return constructors_urls
         except:
             return []
+
 
     def get_circuit(self, instance: Races) -> str:
         """Return url to circuit that the race was organized on 
