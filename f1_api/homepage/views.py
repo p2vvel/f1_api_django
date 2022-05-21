@@ -50,3 +50,7 @@ def create_token(request):
     token = Token.objects.create(user=request.user)
     return redirect(reverse("panel"))
 
+
+@require_http_methods(["GET"])
+def swagger(request):
+    return render(request, "swagger.html")

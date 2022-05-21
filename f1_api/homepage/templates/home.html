@@ -1,5 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-HOME
+<h1 id="f1-api">F1 API</h1>
+<p>API draft:</p>
+<pre><code>/drivers - ALL methods, <span class="hljs-keyword">additional </span><span class="hljs-meta">info</span> about podiums, championships, wins, pole positions, current age, teams in each year
+
+/constructors - SAME AS ABOVE
+
+/circuits - <span class="hljs-meta">GET</span>, <span class="hljs-keyword">additional </span><span class="hljs-meta">info</span> about all races
+
+/seasons - <span class="hljs-meta">GET</span>, <span class="hljs-keyword">additional </span><span class="hljs-meta">info</span> about all races, drivers, teams, WDC <span class="hljs-keyword">and </span>WCC <span class="hljs-meta">info</span>
+
+/race - <span class="hljs-meta">GET</span>, <span class="hljs-keyword">additional </span><span class="hljs-meta">info</span> about drivers, teams, quali <span class="hljs-keyword">and </span>race results
+</code></pre><p>Extra:</p>
+<ul>
+<li>token authorization</li>
+<li>throttling</li>
+<li>paging</li>
+<li>sorting</li>
+<li>filtering</li>
+<li>format choose (json/yaml)</li>
+<li>oauth</li>
+</ul>
+
 {% endblock content %}
