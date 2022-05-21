@@ -82,12 +82,6 @@ WSGI_APPLICATION = 'f1_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 DATABASES = {
     'default': {
@@ -166,8 +160,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '60/minute',
-        'user': '600/minute'
+        'anon': '6/minute',
+        'user': '12/minute'
     },
     # default JSON only, yaml added manually:
     'DEFAULT_PARSER_CLASSES': (

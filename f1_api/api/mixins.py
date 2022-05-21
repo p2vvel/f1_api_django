@@ -5,7 +5,7 @@ from rest_framework.generics import get_object_or_404
 
 
 
-def process_request_or_cache(throttled_function: Callable[..., Response], request, timeout: int=2,*args, **kwargs) -> Response:
+def process_request_or_cache(throttled_function: Callable[..., Response], request, timeout: int=60*60*3,*args, **kwargs) -> Response:
     """
     Check if result of function given as parameter has already been cached,
     if yes, return reponse with cache content, else - save function 
