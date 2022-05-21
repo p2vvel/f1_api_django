@@ -13,15 +13,3 @@ class UserBurstThrottle(UserRateThrottle):
 
 class UserSustainedThrottle(UserRateThrottle):
     scope = "user_sustained"
-
-
-
-# class ViewThrottle:
-#     """
-#     Class defining throttle rates for views, must be inherited by them (views)
-#     """
-#     throttle_classes = [
-#         AnonBurstThrottle, 
-#         AnonSustainedThrottle,
-#         UserBurstThrottle,
-#         UserSustainedThrottle]

@@ -155,14 +155,19 @@ REST_FRAMEWORK = {
        'rest_framework.authentication.TokenAuthentication',
    ),
 
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
+   'DEFAULT_THROTTLE_CLASSES': [
+        'api.throttling.AnonBurstThrottle',
+        'api.throttling.AnonSustainedThrottle',
+        'api.throttling.UserBurstThrottle',
+        'api.throttling.UserSustainedThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '6/minute',
-        'user': '12/minute'
+        "anon_burst": "60/min",
+        "anon_sustained": "1000/day",
+        "user_burst": "600/min",
+        "user_sustained": "10000/day",
     },
+
     # default JSON only, yaml added manually:
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
@@ -173,29 +178,6 @@ REST_FRAMEWORK = {
         'rest_framework_yaml.renderers.YAMLRenderer',
     ),
 }
-
-#    'DEFAULT_THROTTLE_CLASSES': [
-#         'rest_framework.throttling.AnonRateThrottle',
-#         # 'rest_framework.throttling.UserRateThrottle'
-#     ],
-#     'DEFAULT_THROTTLE_RATES': {
-#         'anon': '10/min',
-#         # 'user': '100/day'
-#     }
-#    'DEFAULT_THROTTLE_CLASSES': [
-#         'api.throttling.AnonBurstThrottle',
-#         'api.throttling.AnonSustainedThrottle',
-#         'api.throttling.UserBurstThrottle',
-#         'api.throttling.UserSustainedThrottle',
-#         # 'rest_framework.throttling.ScopedRateThrottle',
-#     ],
-#     'DEFAULT_THROTTLE_RATES': {
-#         "anon_burst": "6/minute",
-#         "anon_sustained": "1000/day",
-#         "user_burst": "10/minute",
-#         "user_sustained": "10000/day",
-#     },
-# }
 
 LOGIN_URL = "/login/"
 
