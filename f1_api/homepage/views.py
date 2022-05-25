@@ -1,18 +1,19 @@
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, throttle_classes
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 @throttle_classes([])
 def home(request):
     context = {}
     return render(request, "home.html", context)
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 @throttle_classes([])
 @login_required(login_url="/login")
 def panel(request):
@@ -22,13 +23,13 @@ def panel(request):
     return render(request, "panel.html", context)
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 @throttle_classes([])
 def docs(request):
     return render(request, "docs.html")
 
 
-@api_view(["POST"])
+@require_http_methods(["POST"])
 @throttle_classes([])
 @login_required(login_url="/login")
 def delete_token(request):
@@ -46,7 +47,7 @@ def delete_token(request):
         return redirect(reverse("home"))
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 @throttle_classes([])
 @login_required(login_url="/login")
 def create_token(request):
@@ -54,7 +55,7 @@ def create_token(request):
     return redirect(reverse("panel"))
 
 
-@api_view(["GET"])
+@require_http_methods(["GET"])
 @throttle_classes([])
 def swagger(request):
     return render(request, "swagger.html")
