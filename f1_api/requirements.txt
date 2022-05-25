@@ -1,0 +1,8 @@
+Django~=4.0.4
+djangorestframework~=3.13.1
+mysqlclient~=2.1.0
+python-dateutil~=2.8.2
+django-filter~=21.1
+djangorestframework-yaml~=2.0.0
+redis~=4.2.2
+uritemplate~=4.1.1
