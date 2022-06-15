@@ -24,7 +24,7 @@ class ConstructorSerializer(serializers.ModelSerializer):
         Returns:
             int: number of won races
         """
-        return self.podiums_data.get("1", 0)
+        return self.podiums_data.get(1, 0)
 
 
     def get_podiums(self, constructor: Constructors) -> int:

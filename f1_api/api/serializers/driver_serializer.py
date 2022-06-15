@@ -27,7 +27,7 @@ class DriverSerializer(serializers.ModelSerializer):
         Returns:
             int: number won races
         """
-        return self.podiums_data.get("1", 0)
+        return self.podiums_data.get(1, 0)
 
 
     def get_podiums(self, driver: Drivers) -> int:
