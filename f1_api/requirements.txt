@@ -6,3 +6,4 @@ django-filter~=21.1
 djangorestframework-yaml~=2.0.0
 redis~=4.2.2
 uritemplate~=4.1.1
+gunicorn
