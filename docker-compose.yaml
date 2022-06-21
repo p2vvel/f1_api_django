@@ -1,6 +1,5 @@
 version: '3.9'
 
-
 services:
   nginx:
     image: nginx
@@ -15,7 +14,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
     healthcheck:
-      test: ["CMD", 'mysqladmin', 'ping', '-h', '127.0.0.1', '-u', 'root', '-p${DB_PASSWORD}' ]
+      test: ["CMD", 'mysqladmin', 'ping', '-h', '127.0.0.1', '-u', 'root', '-p${DB_PASSWORD}']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -36,7 +35,6 @@ services:
       - DJANGO_SETTINGS_MODULE=f1_api.production
     depends_on:
       mysql:
-          condition: service_healthy
+        condition: service_healthy
       redis:
         condition: service_started
-      
