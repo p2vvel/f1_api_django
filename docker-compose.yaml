@@ -14,6 +14,11 @@ services:
     build: https://github.com/p2vvel/docker_f1_db_ergast.git
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", 'mysqladmin', 'ping', '-h', '127.0.0.1', '-u', 'root', '-p${DB_PASSWORD}' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   redis:
     image: redis
   api:
@@ -30,7 +35,8 @@ services:
       - REDIS_PORT=6379
       - DJANGO_SETTINGS_MODULE=f1_api.production
     depends_on:
-      - mysql
-      - redis
-      - nginx
+      mysql:
+          condition: service_healthy
+      redis:
+        condition: service_started
       
