@@ -85,12 +85,8 @@ WSGI_APPLICATION = 'f1_api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'f1db',
-        'USER': 'root',
-        'PASSWORD': 'djangodjango##',
-        'HOST': '127.0.0.1',
-        'PORT': '8080',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -139,8 +135,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:8090',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
 

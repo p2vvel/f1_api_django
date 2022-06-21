@@ -4,6 +4,8 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, throttle_classes
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
 
 
 @require_http_methods(["GET"])
@@ -17,9 +19,12 @@ def home(request):
 @throttle_classes([])
 @login_required(login_url="/login")
 def panel(request):
-    context = {}
-    tokens = Token.objects.filter(user=request.user)
-    context["tokens"] = tokens
+    try:
+        token = Token.objects.get(user=request.user)
+        context = {"token": token}
+    except:
+        # if user doesn't have an existing token
+        context = {}
     return render(request, "panel.html", context)
 
 
@@ -59,3 +64,17 @@ def create_token(request):
 @throttle_classes([])
 def swagger(request):
     return render(request, "swagger.html")
+
+
+@require_http_methods(["GET", "POST"])
+@throttle_classes([])
+def signup(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid:
+            form.save()
+            return redirect(reverse("login"))
+        else:
+            return redirect("signup")
+    elif request.method == "GET":
+        return render(request, "signup.html", context={"form": UserCreationForm()})

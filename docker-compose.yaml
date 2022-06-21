@@ -22,7 +22,7 @@ services:
     image: redis
   api:
     build: .
-    command: "python -m gunicorn --bind 0.0.0.0:8000 f1_api.wsgi"
+    command: bash -c "python manage.py migrate && python -m gunicorn --bind 0.0.0.0:8000 f1_api.wsgi"
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DB_HOST=mysql

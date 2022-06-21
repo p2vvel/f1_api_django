@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-    {% if tokens %}
+    {% if token %}
     <table class="table">
         <thead class="table-dark">
             <th>Created</th>
@@ -11,7 +11,6 @@
             <tbody>
                 <form action="{% url 'delete_token' %}" method="post">
                     {% csrf_token %}
-                    {% for token in tokens %}
                     <tr>
                         <td>{{ token.created }}</td>
                         <td>{{ token.key }}</td>
@@ -19,10 +18,14 @@
                             <button name="token_pk" class="btn btn-outline-danger" value={{ token.pk }}>X</button>
                         </td>
                     </tr>
-                    {% endfor %}
                 </form>
             </tbody>
         </table>
+        <p>
+            <b>Header:</b>
+            </br>
+            <code>Authorization: Token {{token.pk}}</code>
+        </p>
     {% else %}
         <a class="btn btn-outline-primary" href="{% url 'create_token' %}">Create Token</a>
     {% endif %}
