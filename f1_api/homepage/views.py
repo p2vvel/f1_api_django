@@ -72,8 +72,13 @@ def signup(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid:
-            form.save()
-            return redirect(reverse("login"))
+            try:
+                form.save()
+                return redirect(reverse("login"))
+            except:
+                # necessary to handle situation where user wants to create account with existing login
+                # TODO: add message about signup fail
+                return redirect(reverse("signup"))
         else:
             return redirect("signup")
     elif request.method == "GET":
