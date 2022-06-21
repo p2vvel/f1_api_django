@@ -6,4 +6,4 @@ COPY requirements.txt ./
 RUN apt update && apt install -y libmariadb-dev
 RUN pip install --no-cache-dir -r ./requirements.txt
 
-COPY . .
+COPY ./f1_api/ .
