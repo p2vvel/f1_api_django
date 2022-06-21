@@ -8,6 +8,8 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - api
   mysql:
     build: https://github.com/p2vvel/docker_f1_db_ergast.git
     environment:
@@ -27,4 +29,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - DJANGO_SETTINGS_MODULE=f1_api.production
+    depends_on:
+      - mysql
+      - redis
+      - nginx
       
